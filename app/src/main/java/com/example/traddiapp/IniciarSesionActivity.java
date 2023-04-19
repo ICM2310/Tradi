@@ -22,7 +22,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
         binding.buttonIniciarSesion.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), InicioActivity.class));
+                startActivity(new Intent(getApplicationContext(), MainApp.class));
             }
         });
 
