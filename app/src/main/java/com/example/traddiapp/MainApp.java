@@ -11,6 +11,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import com.example.traddiapp.TareasAsync.GetMarketAsyncTask;
 import com.example.traddiapp.databinding.ActivityMapBinding;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.concurrent.ExecutionException;
 
@@ -35,6 +37,8 @@ public class MainApp extends FragmentActivity  {
     private FusedLocationProviderClient fusedLocationClient;
 
     private LocationRequest locationRequest;
+
+    private FirebaseAuth firebaseAuth;
     private LocationCallback locationCallback;
     private double latitudeUbi;
     private double longitudeUbi;
@@ -44,9 +48,18 @@ public class MainApp extends FragmentActivity  {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        firebaseAuth = FirebaseAuth.getInstance();
         binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        binding.buttonCerrarSesion.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                firebaseAuth.signOut();
+                Intent intent = new Intent(MainApp.this, IniciarSesionActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         binding.btoHistorial.setOnClickListener(new View.OnClickListener() {
             @Override

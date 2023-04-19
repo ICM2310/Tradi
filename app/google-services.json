@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "179949282811",
+    "project_id": "tradi-a49d2",
+    "storage_bucket": "tradi-a49d2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:179949282811:android:c48822ce9ed73c3d12175e",
+        "android_client_info": {
+          "package_name": "com.example.traddiapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "179949282811-hcp2tetnm1p9rnfss04n1srmv8kvik72.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1NHuAUssp9EQHPv8crH-Hwh3H4pahmVU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "179949282811-hcp2tetnm1p9rnfss04n1srmv8kvik72.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
