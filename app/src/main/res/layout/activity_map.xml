@@ -39,20 +39,22 @@
         android:layout_gravity="bottom">
 
         <EditText
-            android:id="@+id/editText"
+            android:id="@+id/editTextBuscar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#EAEAEA"
-            android:hint="Escribe aquí"
+            android:hint="Direccion"
             android:inputType="text"
-            android:padding="8dp"/>
+            android:padding="8dp"
+            android:imeOptions="actionSend"
+            />
 
         <LinearLayout
             android:id="@+id/buttonsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_below="@id/editText"
+            android:layout_below="@id/editTextBuscar"
             android:gravity="center">
 
             <Button
@@ -64,6 +66,8 @@
                 android:text="Pedir"
                 android:textColor="#FFFFFF"
                 android:layout_marginRight="8dp"/>
+
+
 
             <Button
                 android:id="@+id/btoRestaurantes"
