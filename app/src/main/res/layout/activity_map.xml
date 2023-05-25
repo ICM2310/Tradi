@@ -10,7 +10,7 @@
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        class="com.google.android.gms.maps.SupportMapFragment"/>
+        class="com.google.android.gms.maps.SupportMapFragment" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -46,8 +46,7 @@
             android:hint="Direccion"
             android:inputType="text"
             android:padding="8dp"
-            android:imeOptions="actionSend"
-            />
+            android:imeOptions="actionSend" />
 
         <LinearLayout
             android:id="@+id/buttonsLayout"
@@ -57,17 +56,14 @@
             android:layout_below="@id/editTextBuscar"
             android:gravity="center">
 
-            <Button
-                android:id="@+id/btoPedir"
+            <Spinner
+                android:id="@+id/spinnerPedir"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#000000"
-                android:text="Pedir"
-                android:textColor="#FFFFFF"
-                android:layout_marginRight="8dp"/>
-
-
+                android:background="#EAEAEA"
+                android:padding="8dp"
+                android:spinnerMode="dropdown"/>
 
             <Button
                 android:id="@+id/btoRestaurantes"
@@ -78,7 +74,7 @@
                 android:text="Restaurantes"
                 android:textColor="#FFFFFF"
                 android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"/>
+                android:layout_marginRight="8dp" />
 
             <Button
                 android:id="@+id/btoHistorial"

@@ -8,12 +8,17 @@ import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 
@@ -30,13 +35,22 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
-
-
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+
+import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
+import org.osmdroid.bonuspack.routing.OSRMRoadManager;
+import org.osmdroid.util.BoundingBox;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.bonuspack.routing.Road;
+import org.osmdroid.bonuspack.routing.RoadManager;
 
 public class MainApp extends FragmentActivity implements OnMapReadyCallback {
     static final int PERMISSIONS_REQUEST_LOCATION = 0;
@@ -61,6 +75,21 @@ public class MainApp extends FragmentActivity implements OnMapReadyCallback {
 
         locationRequest = createLocationRequest();
 
+        Spinner spinnerPedir = findViewById(R.id.spinnerPedir);
+
+        List<String> opciones = new ArrayList<>();
+        opciones.add("Pedir");
+        opciones.add("Andrés Carne de Res");
+        opciones.add("Harry Sasson");
+        opciones.add("Criterion");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, opciones);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinnerPedir.setAdapter(adapter);
+
+
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
         assert mapFragment != null;
         mapFragment.getMapAsync(this);
@@ -81,6 +110,9 @@ public class MainApp extends FragmentActivity implements OnMapReadyCallback {
             }
         });
 
+
+
+
         binding.editTextBuscar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
@@ -90,9 +122,6 @@ public class MainApp extends FragmentActivity implements OnMapReadyCallback {
 
                     GeocoderTask task = new GeocoderTask(getBaseContext(),mMap);
                     task.execute(address);
-
-                    //Distancia.distance(task.get().latitude, task.get().longitude,  latitudeUbi, longitudeUbi), Toast.LENGTH_LONG).show();
-
                     binding.editTextBuscar.setText("");
 
                     return true;
@@ -165,6 +194,93 @@ public class MainApp extends FragmentActivity implements OnMapReadyCallback {
             }
         };
 
+        spinnerPedir.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                String opcionSeleccionada = (String) adapterView.getItemAtPosition(position);
+
+                switch (opcionSeleccionada) {
+                    case "Andrés Carne de Res": {
+
+                        mMap.clear();
+                        LatLng puntoInicio = new LatLng(latitudeUbi, longitudeUbi);
+                        mMap.addMarker(new MarkerOptions().position(puntoInicio).title("Mi Ubicaicon"));
+                        String address = "Carrera 6 # 12-20, Chía, Cundinamarca, Colombia";
+                        GeocoderTask task = new GeocoderTask(getBaseContext(), mMap);
+                        task.execute(address);
+                        LatLng puntoDestino = null;
+                        try {
+                            puntoDestino = new LatLng(task.get().latitude, task.get().longitude);
+                        } catch (ExecutionException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        GeoPoint geoPuntoInicio = new GeoPoint(puntoInicio.latitude, puntoInicio.longitude);
+                        GeoPoint geoPuntoDestino = new GeoPoint(puntoDestino.latitude, puntoDestino.longitude);
+
+                        ArrayList<GeoPoint> waypoints = new ArrayList<>();
+                        waypoints.add(geoPuntoInicio);
+                        waypoints.add(geoPuntoDestino);
+                        new GetRouteTask().execute(waypoints);
+
+                        break;
+                    }
+                    case "Harry Sasson": {
+
+                        mMap.clear();
+                        LatLng puntoInicio = new LatLng(latitudeUbi, longitudeUbi);
+                        mMap.addMarker(new MarkerOptions().position(puntoInicio).title("Mi Ubicaicon"));
+                        String address = "Carrera 9 # 75-70, Bogotá, Colombia";
+                        GeocoderTask task = new GeocoderTask(getBaseContext(), mMap);
+                        task.execute(address);
+                        LatLng puntoDestino = null;
+                        try {
+                            puntoDestino = new LatLng(task.get().latitude, task.get().longitude);
+                        } catch (ExecutionException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        GeoPoint geoPuntoInicio = new GeoPoint(puntoInicio.latitude, puntoInicio.longitude);
+                        GeoPoint geoPuntoDestino = new GeoPoint(puntoDestino.latitude, puntoDestino.longitude);
+
+                        ArrayList<GeoPoint> waypoints = new ArrayList<>();
+                        waypoints.add(geoPuntoInicio);
+                        waypoints.add(geoPuntoDestino);
+                        new GetRouteTask().execute(waypoints);
+
+                        break;
+                    }
+                    case "Criterion": {
+
+                        mMap.clear();
+                        LatLng puntoInicio = new LatLng(latitudeUbi, longitudeUbi);
+                        mMap.addMarker(new MarkerOptions().position(puntoInicio).title("Mi Ubicaicon"));
+                        String address = "Calle 69A # 5-75, Bogotá, Colombia";
+                        GeocoderTask task = new GeocoderTask(getBaseContext(), mMap);
+                        task.execute(address);
+                        LatLng puntoDestino = null;
+                        try {
+                            puntoDestino = new LatLng(task.get().latitude, task.get().longitude);
+                        } catch (ExecutionException | InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        GeoPoint geoPuntoInicio = new GeoPoint(puntoInicio.latitude, puntoInicio.longitude);
+                        GeoPoint geoPuntoDestino = new GeoPoint(puntoDestino.latitude, puntoDestino.longitude);
+
+                        ArrayList<GeoPoint> waypoints = new ArrayList<>();
+                        waypoints.add(geoPuntoInicio);
+                        waypoints.add(geoPuntoDestino);
+                        new GetRouteTask().execute(waypoints);
+
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                // Acción cuando no se selecciona ninguna opción
+            }
+        });
+
     }
 
     @Override
@@ -210,5 +326,46 @@ public class MainApp extends FragmentActivity implements OnMapReadyCallback {
         }
     }
 
+    private class GetRouteTask extends AsyncTask<ArrayList<GeoPoint>, Void, Road> {
+
+        @Override
+        protected Road doInBackground(ArrayList<GeoPoint>... params) {
+            ArrayList<GeoPoint> waypoints = params[0];
+
+            // Crear una instancia de RoadManager
+            RoadManager roadManager = new OSRMRoadManager(MainApp.this, "MapQuest");
+
+            // Obtener la ruta utilizando RoadManager
+            return roadManager.getRoad(waypoints);
+        }
+
+        @Override
+        protected void onPostExecute(Road road) {
+            if (road != null && road.mStatus == Road.STATUS_OK) {
+                ArrayList<GeoPoint> rutaGeoPoints = road.mRouteHigh;
+
+                // Pintar la ruta en el mapa
+                PolylineOptions polylineOptions = new PolylineOptions()
+                        .color(Color.RED)
+                        .width(5);
+
+                for (GeoPoint point : rutaGeoPoints) {
+                    LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
+                    polylineOptions.add(latLng);
+                }
+
+                mMap.addPolyline(polylineOptions);
+
+                // Ajustar la cámara para mostrar la ruta completa
+                LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                for (GeoPoint point : rutaGeoPoints) {
+                    LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());
+                    builder.include(latLng);
+                }
+                LatLngBounds bounds = builder.build();
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 130));
+            }
+        }
+    }
 
 }
