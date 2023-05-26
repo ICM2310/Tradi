@@ -3,7 +3,9 @@ package com.example.traddiapp;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.Manifest;
 import android.content.Intent;
@@ -14,12 +16,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+
 
 
 import com.example.traddiapp.TareasAsync.GeocoderTask;
@@ -40,30 +47,25 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import org.osmdroid.bonuspack.routing.MapQuestRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
-import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 
-public class MainApp extends FragmentActivity implements OnMapReadyCallback {
+
+public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
+
     static final int PERMISSIONS_REQUEST_LOCATION = 0;
-
     private static GoogleMap mMap;
-
     private FusedLocationProviderClient fusedLocationClient;
-
     private LocationRequest locationRequest;
     private LocationCallback locationCallback;
     private double latitudeUbi;
     private double longitudeUbi;
-
     ActivityMapBinding binding;
 
     @Override
@@ -73,9 +75,43 @@ public class MainApp extends FragmentActivity implements OnMapReadyCallback {
         binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        //ActionBar actionBar = getSupportActionBar();
+
+
+        /*toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.action_option1) {
+                    // Acción para la opción 1
+                    Toast.makeText(MainApp.this, "Opción 1 clickeada", Toast.LENGTH_SHORT).show();
+                    return true;
+                } else if (itemId == R.id.action_option2) {
+                    // Acción para la opción 2
+                    Toast.makeText(MainApp.this, "Opción 2 clickeada", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                return false;
+            }
+        });*/
+
+
         locationRequest = createLocationRequest();
 
         Spinner spinnerPedir = findViewById(R.id.spinnerPedir);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_item) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View view = super.getView(position, convertView, parent);
+                TextView textView = (TextView) view.findViewById(android.R.id.text1);
+                textView.setTextColor(Color.WHITE); // Establecer el color del texto en blanco
+                return view;
+            }
+        };
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerPedir.setAdapter(adapter);
 
         List<String> opciones = new ArrayList<>();
         opciones.add("Pedir");
@@ -83,12 +119,8 @@ public class MainApp extends FragmentActivity implements OnMapReadyCallback {
         opciones.add("Harry Sasson");
         opciones.add("Criterion");
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, opciones);
-
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinnerPedir.setAdapter(adapter);
-
+        adapter.addAll(opciones);
+        adapter.notifyDataSetChanged();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapView);
         assert mapFragment != null;
@@ -109,9 +141,6 @@ public class MainApp extends FragmentActivity implements OnMapReadyCallback {
                 startActivity(intent);
             }
         });
-
-
-
 
         binding.editTextBuscar.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -347,7 +376,7 @@ public class MainApp extends FragmentActivity implements OnMapReadyCallback {
                 // Pintar la ruta en el mapa
                 PolylineOptions polylineOptions = new PolylineOptions()
                         .color(Color.RED)
-                        .width(5);
+                        .width(7);
 
                 for (GeoPoint point : rutaGeoPoints) {
                     LatLng latLng = new LatLng(point.getLatitude(), point.getLongitude());

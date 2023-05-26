@@ -24,8 +24,8 @@
         <activity
             android:name=".HistorialActivity"
             android:exported="false" />
-        <activity
-            android:name=".MainApp"
+
+        <activity android:name=".MainApp" android:theme="@style/Theme.TraddiApp.NoActionBar"
             android:exported="false" />
 
         <meta-data

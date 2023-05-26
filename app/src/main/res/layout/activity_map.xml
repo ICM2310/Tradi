@@ -12,22 +12,41 @@
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.SupportMapFragment" />
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_gravity="end">
+
+            <ImageView
+                android:id="@+id/btoUsuarios"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/usuarios"
+                android:padding="8dp" />
+
+            <ImageView
+                android:id="@+id/btoCerrarSesion"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/cerrarsesion"
+                android:padding="8dp" />
+
+        </LinearLayout>
+
+    </androidx.appcompat.widget.Toolbar>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <Button
-            android:id="@+id/buttonCerrarSesion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginRight="16dp"
-            android:background="#000000"
-            android:text="Cerrar Sesión"
-            android:textColor="#FFFFFF" />
 
     </RelativeLayout>
 
@@ -43,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#EAEAEA"
-            android:hint="Direccion"
+            android:hint="Dirección"
             android:inputType="text"
             android:padding="8dp"
             android:imeOptions="actionSend" />
@@ -61,20 +80,23 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#EAEAEA"
+                android:background="#000000"
                 android:padding="8dp"
-                android:spinnerMode="dropdown"/>
+                android:spinnerMode="dropdown"
+                style="@style/SpinnerStyle" />
+
 
             <Button
                 android:id="@+id/btoRestaurantes"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
                 android:layout_weight="1"
                 android:background="#000000"
                 android:text="Restaurantes"
                 android:textColor="#FFFFFF"
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp" />
+                android:textSize="10sp"
+                tools:ignore="SmallSp" />
 
             <Button
                 android:id="@+id/btoHistorial"
