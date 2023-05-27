@@ -1,33 +1,71 @@
 {
   "project_info": {
-    "project_number": "179949282811",
-    "project_id": "tradi-a49d2",
-    "storage_bucket": "tradi-a49d2.appspot.com"
+    "project_number": "485891991544",
+    "firebase_url": "https://taller3-af1d6-default-rtdb.firebaseio.com",
+    "project_id": "taller3-af1d6",
+    "storage_bucket": "taller3-af1d6.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:179949282811:android:c48822ce9ed73c3d12175e",
+        "mobilesdk_app_id": "1:485891991544:android:d8c836da77fd7b11ea180d",
         "android_client_info": {
-          "package_name": "com.example.traddiapp"
+          "package_name": "com.example.taller3"
         }
       },
       "oauth_client": [
         {
-          "client_id": "179949282811-hcp2tetnm1p9rnfss04n1srmv8kvik72.apps.googleusercontent.com",
+          "client_id": "485891991544-g95lmt5j11r3gi1f2p27c004roi31bd2.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyB1NHuAUssp9EQHPv8crH-Hwh3H4pahmVU"
+          "current_key": "AIzaSyBqrsYzLkNPkFcZHVDWgLtjgUSaYmrRBWw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "179949282811-hcp2tetnm1p9rnfss04n1srmv8kvik72.apps.googleusercontent.com",
+              "client_id": "485891991544-g95lmt5j11r3gi1f2p27c004roi31bd2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:485891991544:android:3f8ac3b68174e1cdea180d",
+        "android_client_info": {
+          "package_name": "com.example.traddiapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "485891991544-pt7umh71e7o173svc82bi997fbts1oh0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.traddiapp",
+            "certificate_hash": "1e1355c921734675c70b0e775519981aebd50a91"
+          }
+        },
+        {
+          "client_id": "485891991544-g95lmt5j11r3gi1f2p27c004roi31bd2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBqrsYzLkNPkFcZHVDWgLtjgUSaYmrRBWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "485891991544-g95lmt5j11r3gi1f2p27c004roi31bd2.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

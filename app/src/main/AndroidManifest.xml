@@ -19,13 +19,21 @@
         android:theme="@style/Theme.TraddiApp"
         tools:targetApi="31">
         <activity
+            android:name=".ubiUsuario"
+            android:exported="false" />
+        <activity
+            android:name=".listUsuariosConect"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:exported="false"
+            />
+        <activity
             android:name=".RestaurantesGActivity"
             android:exported="false" />
         <activity
             android:name=".HistorialActivity"
             android:exported="false" />
-
-        <activity android:name=".MainApp" android:theme="@style/Theme.TraddiApp.NoActionBar"
+        <activity
+            android:name=".MainApp"
             android:exported="false" />
 
         <meta-data

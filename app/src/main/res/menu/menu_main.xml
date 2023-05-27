@@ -2,9 +2,21 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.traddiapp.MainActivity">
+
+
+
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/btolistUsers"
+        android:icon="@drawable/users"
+        android:title="Usuarios"
+        app:showAsAction="ifRoom"
+    />
+
+    <item
+        android:id="@+id/menuLogOut"
+        android:icon="@drawable/logout"
+        android:title="Usuarios"
+        app:showAsAction="ifRoom"
+        />
+
 </menu>

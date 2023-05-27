@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.TraddiApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.TraddiApp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/black</item>
         <item name="colorPrimaryVariant">@color/teal_700</item>
@@ -16,6 +16,15 @@
 
     <style name="SpinnerStyle" parent="Widget.AppCompat.Spinner">
         <item name="android:textColor">#FFFFFF</item>
+    </style>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Otros atributos de estilo -->
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <!-- Otros atributos de estilo específicos si los tienes -->
     </style>
 
     <style name="Theme.TraddiApp.NoActionBar">

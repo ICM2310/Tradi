@@ -16,6 +16,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +47,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +62,7 @@ import org.osmdroid.bonuspack.routing.RoadManager;
 public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
 
     static final int PERMISSIONS_REQUEST_LOCATION = 0;
+    private FirebaseAuth mAuth;
     private static GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationRequest locationRequest;
@@ -74,28 +77,11 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
 
         binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        //ActionBar actionBar = getSupportActionBar();
+        mAuth = FirebaseAuth.getInstance();
 
 
-        /*toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                int itemId = item.getItemId();
-                if (itemId == R.id.action_option1) {
-                    // Acción para la opción 1
-                    Toast.makeText(MainApp.this, "Opción 1 clickeada", Toast.LENGTH_SHORT).show();
-                    return true;
-                } else if (itemId == R.id.action_option2) {
-                    // Acción para la opción 2
-                    Toast.makeText(MainApp.this, "Opción 2 clickeada", Toast.LENGTH_SHORT).show();
-                    return true;
-                }
-                return false;
-            }
-        });*/
+//        Toolbar toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
 
         locationRequest = createLocationRequest();
@@ -311,7 +297,25 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
         });
 
     }
-
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        int itemClicked = item.getItemId();
+        if(itemClicked == R.id.menuLogOut){
+            mAuth.signOut();
+            Intent intent = new Intent(getBaseContext(), IniciarSesionActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }else if (itemClicked == R.id.btolistUsers){
+            Intent intent = new Intent(this, listUsuariosConect.class);
+            startActivity(intent);
+        }
+        return super.onOptionsItemSelected(item);
+    }
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap){
 

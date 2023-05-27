@@ -12,38 +12,6 @@
         android:layout_height="match_parent"
         class="com.google.android.gms.maps.SupportMapFragment" />
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:layout_gravity="end">
-
-            <ImageView
-                android:id="@+id/btoUsuarios"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/usuarios"
-                android:padding="8dp" />
-
-            <ImageView
-                android:id="@+id/btoCerrarSesion"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/cerrarsesion"
-                android:padding="8dp" />
-
-        </LinearLayout>
-
-    </androidx.appcompat.widget.Toolbar>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
