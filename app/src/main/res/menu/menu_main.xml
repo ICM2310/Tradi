@@ -5,9 +5,10 @@
 
     <item
         android:id="@+id/menu_checkbox"
-        android:title="Checkbox"
+        android:title="Disponible"
         app:actionViewClass="android.widget.CheckBox"
         app:showAsAction="always" />
+
 
 
     <item

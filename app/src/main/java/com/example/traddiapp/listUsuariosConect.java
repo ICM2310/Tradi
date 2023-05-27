@@ -30,7 +30,8 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 public class listUsuariosConect extends AppCompatActivity {
 
     private ListView mListView;
@@ -43,7 +44,8 @@ public class listUsuariosConect extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list_usuarios_conect);
-
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
         mListView = findViewById(R.id.listaUsuarios);
         mUserList = new ArrayList<>();
         mAdapter = new UserListAdapter(this, mUserList);
@@ -51,8 +53,6 @@ public class listUsuariosConect extends AppCompatActivity {
 
         mDatabaseReference = FirebaseDatabase.getInstance().getReference("users");
 
-        // Aquí obtienes los datos de los usuarios desde Firebase y los agregas a la lista
-        // en el método onDataChange del Listener
         DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users");
         ref.addListenerForSingleValueEvent(new ValueEventListener() {
             @SuppressLint("SetTextI18n")
@@ -62,7 +62,9 @@ public class listUsuariosConect extends AppCompatActivity {
                     User user = dataSnapshot.getValue(User.class);
                     assert user != null;
                     user.setUid(dataSnapshot.getKey()); // Agrega el Uid del usuario a la variable user
-                    mUserList.add(user);
+                    if (user.isDisponible() && !user.getUid().equals(currentUser.getUid())) {
+                        mUserList.add(user);
+                    }
                 }
                 mAdapter.notifyDataSetChanged();
             }

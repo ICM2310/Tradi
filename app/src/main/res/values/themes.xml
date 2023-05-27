@@ -17,6 +17,10 @@
     <style name="SpinnerStyle" parent="Widget.AppCompat.Spinner">
         <item name="android:textColor">#FFFFFF</item>
     </style>
+    <style name="MenuCheckBoxStyle" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:textColor">#FFFFFF</item>
+    </style>
+
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Otros atributos de estilo -->
     </style>
