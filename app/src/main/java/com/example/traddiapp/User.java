@@ -7,6 +7,15 @@ public class User {
         private String email;
         private double  latitude;
         private double longitude;
+        private boolean disponible;
+
+    public boolean isDisponible() {
+        return disponible;
+    }
+
+    public void setDisponible(boolean disponible) {
+        this.disponible = disponible;
+    }
 
     public double getLatitude() {
         return latitude;

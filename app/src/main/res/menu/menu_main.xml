@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.traddiapp.MainActivity">
 
+    <item
+        android:id="@+id/menu_checkbox"
+        android:title="Checkbox"
+        app:actionViewClass="android.widget.CheckBox"
+        app:showAsAction="always" />
 
 
     <item

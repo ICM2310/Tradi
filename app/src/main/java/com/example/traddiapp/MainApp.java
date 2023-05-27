@@ -1,11 +1,14 @@
 package com.example.traddiapp;
 
+import static android.content.ContentValues.TAG;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 
 import android.Manifest;
 import android.content.Intent;
@@ -23,6 +26,8 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,9 +53,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
@@ -59,7 +69,7 @@ import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
 
 
-public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
+public class MainApp extends AppCompatActivity implements OnMapReadyCallback  {
 
     static final int PERMISSIONS_REQUEST_LOCATION = 0;
     private FirebaseAuth mAuth;
@@ -71,6 +81,8 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
     private double longitudeUbi;
     ActivityMapBinding binding;
 
+    private MainApp mActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,10 +90,6 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
         binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         mAuth = FirebaseAuth.getInstance();
-
-
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
 
 
         locationRequest = createLocationRequest();
@@ -297,25 +305,88 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
         });
 
     }
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu){
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        MenuItem item = menu.findItem(R.id.menu_checkbox);
+        CheckBox checkBox = (CheckBox) item.getActionView();
+        checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    actualizarDisponibilidadUsuarioTrue();
+                } else {
+                    actualizarDisponibilidadUsuarioFalse();
+                }
+            }
+        });
         return true;
     }
+
+    public void actualizarDisponibilidadUsuarioFalse() {
+        String userUid = getIntent().getStringExtra("userUid");
+        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("users").child(userUid);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("disponible", false);
+
+        myRef.updateChildren(updates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Log.w(TAG, "Error al actualizar la disponibilidad del usuario", databaseError.toException());
+                } else {
+                    Log.i(TAG, "Disponibilidad del usuario actualizada correctamente");
+                }
+            }
+        });
+    }
+    public void actualizarDisponibilidadUsuarioTrue() {
+        String userUid = getIntent().getStringExtra("userUid");
+        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("users").child(userUid);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("disponible", true);
+
+        myRef.updateChildren(updates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Log.w(TAG, "Error al actualizar la disponibilidad del usuario", databaseError.toException());
+                } else {
+                    Log.i(TAG, "Disponibilidad del usuario actualizada correctamente");
+                }
+            }
+        });
+    }
+
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
+    public boolean onOptionsItemSelected(MenuItem item) {
         int itemClicked = item.getItemId();
-        if(itemClicked == R.id.menuLogOut){
+        if (itemClicked == R.id.menuLogOut) {
             mAuth.signOut();
             Intent intent = new Intent(getBaseContext(), IniciarSesionActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
-        }else if (itemClicked == R.id.btolistUsers){
+        } else if (itemClicked == R.id.btolistUsers) {
             Intent intent = new Intent(this, listUsuariosConect.class);
             startActivity(intent);
+        } else if (itemClicked == R.id.checkBox) {
+            View actionView = item.getActionView();
+            CheckBox checkBox = actionView.findViewById(R.id.checkBox);
+            boolean isChecked = checkBox.isChecked();
+            // Aquí puedes realizar las acciones que desees según el estado del CheckBox
+            if (isChecked) {
+
+            } else {
+                // El CheckBox no está marcado
+                // Realiza las acciones correspondientes
+            }
         }
         return super.onOptionsItemSelected(item);
     }
+
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap){
 
@@ -325,7 +396,6 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
         mMap.addMarker(new MarkerOptions().position(bogota).title("Marker Current Ubication"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(bogota));
         mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
-
 
     }
 
@@ -358,6 +428,7 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
             fusedLocationClient.requestLocationUpdates( locationRequest, locationCallback, null);
         }
     }
+
 
     private class GetRouteTask extends AsyncTask<ArrayList<GeoPoint>, Void, Road> {
 
