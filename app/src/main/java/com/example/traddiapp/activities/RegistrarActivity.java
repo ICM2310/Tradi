@@ -1,4 +1,4 @@
-package com.example.traddiapp;
+package com.example.traddiapp.activities;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.traddiapp.MainApp;
 import com.example.traddiapp.databinding.ActivityRegistrarBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -39,6 +40,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class RegistrarActivity extends AppCompatActivity {
 
@@ -119,6 +121,7 @@ public class RegistrarActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Intent intent = new Intent(getBaseContext(), MainApp.class);
+                                intent.putExtra("userUid", Objects.requireNonNull(mAuth.getCurrentUser()).getUid());
                                 startActivity(intent);
                                 finish();
                             }

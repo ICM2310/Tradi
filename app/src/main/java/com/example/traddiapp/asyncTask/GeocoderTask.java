@@ -1,15 +1,12 @@
-package com.example.traddiapp.TareasAsync;
+package com.example.traddiapp.asyncTask;
 
 
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.widget.Toast;
-
-import androidx.core.content.ContextCompat;
 
 
 import com.google.android.gms.maps.CameraUpdateFactory;

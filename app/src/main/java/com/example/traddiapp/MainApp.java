@@ -2,27 +2,29 @@ package com.example.traddiapp;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.IntentSenderRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.MenuItemCompat;
+
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationChannel;
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -39,15 +41,27 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import com.example.traddiapp.TareasAsync.GeocoderTask;
-import com.example.traddiapp.TareasAsync.GetMarketAsyncTask;
+import com.example.traddiapp.asyncTask.GeocoderTask;
+import com.example.traddiapp.asyncTask.GetMarketAsyncTask;
+import com.example.traddiapp.activities.HistorialActivity;
+import com.example.traddiapp.activities.IniciarSesionActivity;
+import com.example.traddiapp.activities.RestaurantesGActivity;
+import com.example.traddiapp.activities.ListUsuariosConectActivity;
+import com.example.traddiapp.asyncTask.NotificationTask;
 import com.example.traddiapp.databinding.ActivityMapBinding;
+import com.example.traddiapp.model.Distancia;
+import com.example.traddiapp.model.User;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.common.api.CommonStatusCodes;
+import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.LocationSettingsRequest;
+import com.google.android.gms.location.LocationSettingsResponse;
+import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -59,17 +73,14 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,30 +105,43 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
     private double latitudeUbi;
     private double longitudeUbi;
     ActivityMapBinding binding;
+    private boolean settingsOK = false;
+    private boolean isShowingAlert = false;
 
-    private MainApp mActivity;
+    private static FirebaseMessaging firebaseMessaging = FirebaseMessaging.getInstance();
+    private static String token;
 
-    private static final int NOTIFICATION_ID = 1;
-
-    public static String CHANNEL_ID = "MyApp";
-
+    ActivityResultLauncher<IntentSenderRequest> getLocationSettings = registerForActivityResult(
+            new ActivityResultContracts.StartIntentSenderForResult(),
+            result -> {
+                Log.i(TAG, "Result from settings: " + result.getResultCode());
+                if (result.getResultCode() == RESULT_OK) {
+                    settingsOK = true;
+                } else {
+                    onBackPressed();
+                    Toast.makeText(getApplicationContext(), "GPS desactivado", Toast.LENGTH_SHORT).show();
+                }
+            });
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        System.out.println("------> Name user main app "+getIntent().getStringExtra("userName"));
+
+
         binding = ActivityMapBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         mAuth = FirebaseAuth.getInstance();
-
-        actualizarDisponibilidadUsuarioFalse();
+        IntentFilter filter = new IntentFilter(LocationManager.PROVIDERS_CHANGED_ACTION);
+        registerReceiver(gpsLocationReceiver, filter);
+        actualizarDisponibilidadUsuario(false);
         locationRequest = createLocationRequest();
-
         Spinner spinnerPedir = findViewById(R.id.spinnerPedir);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.spinner_item) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
                 View view = super.getView(position, convertView, parent);
-                TextView textView = (TextView) view.findViewById(android.R.id.text1);
+                TextView textView = view.findViewById(android.R.id.text1);
                 textView.setTextColor(Color.WHITE); // Establecer el color del texto en blanco
                 return view;
             }
@@ -322,6 +346,85 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
             }
         });
 
+        FirebaseApp fp = FirebaseApp.initializeApp(getBaseContext());
+        //System.out.println("--->  "+fp.getName());
+        //firebaseMessaging = FirebaseMessaging.getInstance();
+        if(fp!= null) {
+            Task<String> task = firebaseMessaging.getToken().addOnCompleteListener(new OnCompleteListener<String>() {
+                @Override
+                public void onComplete(@NonNull Task<String> task) {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
+
+                    // Get new FCM registration token
+                    token = task.getResult();
+                    System.out.println("Token ------->" + token);
+                    // Log and toast
+                    String msg = token;
+                    Log.d(TAG, msg);
+                    //Toast.makeText(getBaseContext(), msg, Toast.LENGTH_SHORT).show();
+                    actualizarTokenUsuario(token);
+                }
+            });
+
+
+
+
+        }
+
+       /* firebaseMessaging.subscribeToTopic("ReadyToChat")
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        String msg = "Subscribed";
+                        if (!task.isSuccessful()) {
+                            msg = "Subscribe failed";
+                        }
+                        Log.d(TAG, msg);
+                        System.out.println("Subscribed ------>>>>: "+ "From: " );
+
+                        Toast.makeText(MainApp.this, msg, Toast.LENGTH_SHORT).show();
+                    }
+                });*/
+
+    }
+
+    private final BroadcastReceiver gpsLocationReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+            if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                if (!isShowingAlert) {
+                    checkLocationSettings();
+                    isShowingAlert = true;
+                }
+            } else {
+                isShowingAlert = false;
+            }
+        }
+    };
+
+    private void checkLocationSettings() {
+        LocationSettingsRequest.Builder builder = new
+                LocationSettingsRequest.Builder().addLocationRequest(locationRequest);
+        SettingsClient client = LocationServices.getSettingsClient(this);
+        Task<LocationSettingsResponse> task = client.checkLocationSettings(builder.build());
+        task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
+            @Override
+            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
+                Log.i(TAG, "GPS is ON");
+                settingsOK = true;
+            }
+        });
+        task.addOnFailureListener(e -> {
+            if (((ApiException) e).getStatusCode() == CommonStatusCodes.RESOLUTION_REQUIRED) {
+                ResolvableApiException resolvable = (ResolvableApiException) e;
+                IntentSenderRequest isr = new IntentSenderRequest.Builder(resolvable.getResolution()).build();
+                getLocationSettings.launch(isr);
+            }
+        });
     }
 
     @Override
@@ -335,70 +438,75 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    actualizarDisponibilidadUsuarioTrue();
-                    enviarNotificacionUsuariosDisponibles();
+                    actualizarDisponibilidadUsuario(true);
+                    DatabaseReference ref = FirebaseDatabase.getInstance().getReference("users");
+                    ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                                User user = dataSnapshot.getValue(User.class);
+                                user.setUid(dataSnapshot.getKey());
+                                assert user != null;
+                                if(user.isDisponible()) {
+                                    String userUid = getIntent().getStringExtra("userUid");
+                                    if (!user.getUid().equalsIgnoreCase(userUid)&&
+                                            user.getToken()!=null) {
+
+                                      //  showNotification("HOLAAA","JEJEJEJ");
+
+                                        NotificationTask networkTask = new NotificationTask(user.getToken(),user.getName());
+                                        networkTask.execute();
+
+                                    }
+                                }
+                            }
+
+                        }
+
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Log.e("UserListActivity", "Error al obtener datos de usuarios", error.toException());
+                        }
+                    });
+
+
                 } else {
-                    actualizarDisponibilidadUsuarioFalse();
+                    actualizarDisponibilidadUsuario(false);
                 }
             }
         });
         return true;
     }
 
-    private void enviarNotificacionUsuariosDisponibles() {
+    private void showNotification(String title, String message) {
+        // Crea un Intent para abrir la actividad cuando se hace clic en la notificación
+        Intent intent = new Intent(getBaseContext(), IniciarSesionActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        CollectionReference usuariosRef = db.collection("users");
 
-        // Realizar la consulta para obtener los usuarios con disponibilidad = true
-        Query query = usuariosRef.whereEqualTo("disponible", true);
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    // Iterar sobre los documentos de los usuarios encontrados
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        // Obtener el token de cada usuario
-                        String token = document.getString("token");
-                        // Enviar la notificación a cada usuario
-                        enviarNotificacion(token);
-                    }
-                } else {
-                    Log.d(TAG, "Error getting users with availability: ", task.getException());
-                }
-            }
-        });
-    }
-
-    private void enviarNotificacion(String token) {
-        Intent intent = new Intent(this, IniciarSesionActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Crear la notificación
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+        // Construye la notificación
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(getBaseContext(), "channel_id")
                 .setSmallIcon(R.drawable.noticon)
-                .setContentTitle("Titulo de la Notificación")
-                .setContentText("Contenido de la Notificación")
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
+                .setContentTitle(title)
+                .setContentText(message)
+                .setAutoCancel(true)
+                 .setContentIntent(pendingIntent);
 
-        // Obtener el servicio de notificación y enviar la notificación
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            notificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-            return;
-        }
+        // Muestra la notificación
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(0, notificationBuilder.build());
     }
 
 
-
-    public void actualizarDisponibilidadUsuarioFalse() {
+    public void actualizarDisponibilidadUsuario(boolean isDisponible) {
         String userUid = getIntent().getStringExtra("userUid");
         DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("users").child(userUid);
 
         Map<String, Object> updates = new HashMap<>();
-        updates.put("disponible", false);
+        updates.put("disponible", isDisponible);
 
         myRef.updateChildren(updates, new DatabaseReference.CompletionListener() {
             @Override
@@ -411,24 +519,26 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
             }
         });
     }
-    public void actualizarDisponibilidadUsuarioTrue() {
+
+    public void actualizarTokenUsuario(String token) {
         String userUid = getIntent().getStringExtra("userUid");
         DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("users").child(userUid);
 
         Map<String, Object> updates = new HashMap<>();
-        updates.put("disponible", true);
+        updates.put("token", token);
 
         myRef.updateChildren(updates, new DatabaseReference.CompletionListener() {
             @Override
             public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                 if (databaseError != null) {
-                    Log.w(TAG, "Error al actualizar la disponibilidad del usuario", databaseError.toException());
+                    Log.w(TAG, "Error al actualizar el token del usuario", databaseError.toException());
                 } else {
-                    Log.i(TAG, "Disponibilidad del usuario actualizada correctamente");
+                    Log.i(TAG, "Token del usuario actualizada correctamente");
                 }
             }
         });
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -439,19 +549,8 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
         } else if (itemClicked == R.id.btolistUsers) {
-            Intent intent = new Intent(this, listUsuariosConect.class);
+            Intent intent = new Intent(this, ListUsuariosConectActivity.class);
             startActivity(intent);
-        } else if (itemClicked == R.id.checkBox) {
-            View actionView = item.getActionView();
-            CheckBox checkBox = actionView.findViewById(R.id.checkBox);
-            boolean isChecked = checkBox.isChecked();
-            // Aquí puedes realizar las acciones que desees según el estado del CheckBox
-            if (isChecked) {
-
-            } else {
-                // El CheckBox no está marcado
-                // Realiza las acciones correspondientes
-            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -471,6 +570,7 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     protected void onResume() {
         super.onResume();
+        checkLocationSettings();
         startLocationUpdates();
     }
 
@@ -478,6 +578,12 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
     protected void onPause(){
         super.onPause();
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(gpsLocationReceiver);
     }
 
     @NonNull
@@ -499,10 +605,12 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
     }
 
 
+    @SuppressLint("StaticFieldLeak")
     private class GetRouteTask extends AsyncTask<ArrayList<GeoPoint>, Void, Road> {
 
+        @SafeVarargs
         @Override
-        protected Road doInBackground(ArrayList<GeoPoint>... params) {
+        protected final Road doInBackground(ArrayList<GeoPoint>... params) {
             ArrayList<GeoPoint> waypoints = params[0];
 
             // Crear una instancia de RoadManager

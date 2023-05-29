@@ -1,4 +1,4 @@
-package com.example.traddiapp;
+package com.example.traddiapp.model;
 
 
 

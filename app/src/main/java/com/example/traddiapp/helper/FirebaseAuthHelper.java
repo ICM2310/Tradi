@@ -1,4 +1,4 @@
-package com.example.traddiapp;
+package com.example.traddiapp.helper;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -8,6 +8,7 @@ import android.util.Patterns;
 
 import androidx.appcompat.app.AlertDialog;
 
+import com.example.traddiapp.MainApp;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class FirebaseAuthHelper {

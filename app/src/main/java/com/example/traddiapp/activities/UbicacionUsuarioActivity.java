@@ -1,11 +1,12 @@
-package com.example.traddiapp;
+package com.example.traddiapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-public class ubiUsuario extends AppCompatActivity {
+import com.example.traddiapp.R;
 
+public class UbicacionUsuarioActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

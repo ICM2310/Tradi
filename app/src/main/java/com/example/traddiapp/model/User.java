@@ -1,4 +1,4 @@
-package com.example.traddiapp;
+package com.example.traddiapp.model;
 
 
 public class User {
@@ -8,6 +8,16 @@ public class User {
         private double  latitude;
         private double longitude;
         private boolean disponible;
+
+        private String token;
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     public boolean isDisponible() {
         return disponible;

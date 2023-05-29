@@ -1,4 +1,4 @@
-package com.example.traddiapp;
+package com.example.traddiapp.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -7,17 +7,23 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.traddiapp.MainApp;
+import com.example.traddiapp.model.User;
 import  com.example.traddiapp.databinding.ActivityIniciarSesionBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class IniciarSesionActivity extends AppCompatActivity {
 
@@ -59,6 +65,7 @@ public class IniciarSesionActivity extends AppCompatActivity {
                                 public void onDataRead(User user) {
                                     Intent intent = new Intent(getBaseContext(), MainApp.class);
                                     intent.putExtra("userUid", user.getUid());
+                                    intent.putExtra("userName", user.getName());
                                     startActivity(intent);
                                     finish();
                                 }
@@ -113,3 +120,4 @@ public class IniciarSesionActivity extends AppCompatActivity {
         void onError(String errorMessage);
     }
 }
+

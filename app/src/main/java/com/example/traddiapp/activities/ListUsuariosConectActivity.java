@@ -1,4 +1,4 @@
-package com.example.traddiapp;
+package com.example.traddiapp.activities;
 
 import static android.content.ContentValues.TAG;
 
@@ -16,23 +16,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
+import com.example.traddiapp.R;
+import com.example.traddiapp.model.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-public class listUsuariosConect extends AppCompatActivity {
+public class ListUsuariosConectActivity extends AppCompatActivity {
 
     private ListView mListView;
     private List<User> mUserList;
@@ -117,7 +116,7 @@ public class listUsuariosConect extends AppCompatActivity {
                     String userUid = user.getUid();
 
                     // Abrir el mapa con la ubicación del usuario correspondiente
-                    Intent intent = new Intent(getBaseContext(), ubiUsuario.class);
+                    Intent intent = new Intent(getBaseContext(), UbicacionUsuarioActivity.class);
                     intent.putExtra("userUid", userUid);
                     startActivity(intent);
                 }

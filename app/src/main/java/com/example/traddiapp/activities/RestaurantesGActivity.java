@@ -1,4 +1,4 @@
-package com.example.traddiapp;
+package com.example.traddiapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -17,6 +17,9 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import com.example.traddiapp.R;
+
 import java.util.ArrayList;
 
 public class RestaurantesGActivity extends AppCompatActivity {

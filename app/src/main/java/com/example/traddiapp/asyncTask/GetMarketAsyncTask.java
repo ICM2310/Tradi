@@ -1,4 +1,4 @@
-package com.example.traddiapp.TareasAsync;
+package com.example.traddiapp.asyncTask;
 
 import android.content.Context;
 import android.location.Address;
