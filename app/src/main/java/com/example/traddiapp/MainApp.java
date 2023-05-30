@@ -213,7 +213,7 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
                             mMap.addMarker(a.get());
                             mMap.moveCamera(CameraUpdateFactory.newLatLng(lastUbi));
                             mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
-
+                            ActualizarUbicacionUsuario(lastUbi.latitude, lastUbi.longitude);
                         } catch (ExecutionException | InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -245,6 +245,7 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
                         mMap.addMarker(a.get());
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(lastUbi));
                         mMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+                        ActualizarUbicacionUsuario(lastUbi.latitude, lastUbi.longitude);
 
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -347,8 +348,6 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
         });
 
         FirebaseApp fp = FirebaseApp.initializeApp(getBaseContext());
-        //System.out.println("--->  "+fp.getName());
-        //firebaseMessaging = FirebaseMessaging.getInstance();
         if(fp!= null) {
             Task<String> task = firebaseMessaging.getToken().addOnCompleteListener(new OnCompleteListener<String>() {
                 @Override
@@ -427,6 +426,27 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
         });
     }
 
+    public void ActualizarUbicacionUsuario(double latiude, double longitude) {
+
+        String userUid = getIntent().getStringExtra("userUid");
+        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("users").child(userUid);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("latitude", latiude);
+        updates.put("longitude", longitude);
+
+        myRef.updateChildren(updates, new DatabaseReference.CompletionListener() {
+            @Override
+            public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                if (databaseError != null) {
+                    Log.w(TAG, "Error al actualizar los datos del usuario", databaseError.toException());
+                } else {
+                    Log.i(TAG, "Datos del usuario actualizados correctamente");
+                }
+            }
+        });
+
+    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -583,6 +603,7 @@ public class MainApp extends AppCompatActivity implements OnMapReadyCallback {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        actualizarDisponibilidadUsuario(false);
         unregisterReceiver(gpsLocationReceiver);
     }
 

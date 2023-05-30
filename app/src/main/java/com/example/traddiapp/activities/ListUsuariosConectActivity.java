@@ -103,6 +103,7 @@ public class ListUsuariosConectActivity extends AppCompatActivity {
             nameTextView.setText(user.getName());
 
             locationButton.setTag(position);
+            chatButton.setTag(position);
             locationButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -125,7 +126,17 @@ public class ListUsuariosConectActivity extends AppCompatActivity {
             chatButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // Acción para el otro botón
+                    // Obtener la posición del botón
+                    int position = (int) v.getTag();
+
+                    // Obtener el usuario correspondiente a la posición
+                    User user = getItem(position);
+
+                    // Obtener el UID del usuario
+                    String userUid = user.getUid();
+                    Intent intent = new Intent(getBaseContext(), ChatActivity.class);
+                    intent.putExtra("userUid", userUid);
+                    startActivity(intent);
                 }
             });
 

@@ -1,6 +1,9 @@
 package com.example.traddiapp.model;
 
 
+import java.util.HashMap;
+import java.util.List;
+
 public class User {
         private String name;
         private String profileImageUrl;
@@ -8,8 +11,16 @@ public class User {
         private double  latitude;
         private double longitude;
         private boolean disponible;
-
         private String token;
+       // private HashMap<String,List<String>> mensajes;
+
+   /* public HashMap<String, List<String>> getMensajes() {
+        return mensajes;
+    }
+
+    public void setMensajes(HashMap<String, List<String>> mensajes) {
+        this.mensajes = mensajes;
+    }*/
 
     public String getToken() {
         return token;
